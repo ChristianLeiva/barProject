@@ -1,24 +1,34 @@
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
+
 const Category = require('../Models/CategoryModel');
 const menu = require('../Models/MenuModel');
 const products = require('../Models/ProductModel');
+const menuProduct = require('../Models/Menu_Product');
 
 // INSERTAR MENU Y RELACION CON PRODUCTOS
 const NewProduct = async(req, res) =>{
     try {
-        console.log(req);
-        // menu.create({
-
-        // })
-        //     .then(users => {
-        //         console.log('All users:', JSON.stringify(users, null, 2));
-        //     })
-        //     .catch(error => {
-        //         console.error('Error fetching users:', error);
-        //     });
-        //addProductsToMenu();
+        menu.create({
+            Id_Category: req.body.Id_Category,
+            Name: req.body.Name,
+            Price: req.body.Price,
+            Description: req.body.Description,
+            Img: req.body.Img,
+            Deleted: 0
+        })
+            .then(async users => {
+                let newMenu = await menu.findAll({where:{Name: { [Op.like]: req.body.Name }}});
+                let productsId = req.body.ProductsId
+                addProductsToMenu(newMenu[0].Id, productsId);
+                return res.json(newMenu);
+            })
+            .catch(error => {
+                console.error('Error creating menus:', error);
+            });
     } catch (error) {
         res.status(400).send({
-            code: "Bad request, entra",
+            code: "Bad request",
             error
         })        
     }
@@ -26,20 +36,15 @@ const NewProduct = async(req, res) =>{
 
 async function addProductsToMenu(menuId, productIds) { // <-- PASARLE EL ID DEL MENU Y ARRAY DE PRODUCTSID
     try {
-        const menu = await Menu.findByPk(menuId);
-
-        if (!menu) {
+        const dataMenu = await menu.findByPk(menuId);
+        if (!dataMenu) {
             console.log('Menu not found');
             return;
         }
 
-        const listProducts = await products.findAll({
-            where: {
-                id: productIds
-            }
+        await productIds.forEach(id => {
+            menuProduct.create({ MenuId: dataMenu.Id, ProductId: id });
         });
-
-        await menu.addProducts(products);
 
         console.log('Products added to menu successfully');
     } catch (error) {
@@ -53,7 +58,6 @@ const GetAll = async(req, res) =>{
     try {
         menu.findAll()
             .then(menus => {
-                console.log('All users:', JSON.stringify(menus, null, 2));
                 return res.json(menus);
             })
             .catch(error => {
@@ -84,6 +88,27 @@ const FindById = async(req, res) => {
     }
 }
 
+// BUSCAR POR NOMBRE -> Devuelve un valor o una lista de valores, dependiendo del nombre que pasamos
+const FindByName = async (req, res) => {
+    try{
+        await menu.findAll({
+            where:{
+              Name: {
+                [Op.like]: `%${req.params.name}%`
+              }
+            } 
+            
+        })
+        .then(menuData => {return res.json(menuData);})
+        .catch(error => { console.log(`Error en la resupesta: ${error}`)});
+
+    }
+    catch(error){
+        console.log("error");
+        console.error(error);
+    }
+}
+
 // UPDATE
 // const Update = async(req, res) => {
 //     try{
@@ -108,4 +133,4 @@ const FindById = async(req, res) => {
 
 
 
-module.exports = {GetAll, FindById}
+module.exports = {NewProduct, GetAll, FindById, FindByName}

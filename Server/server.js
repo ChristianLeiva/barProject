@@ -13,6 +13,7 @@ const menu = require('./Routes/MenuRoute');
 
 
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json())
 
 const startServer = async () => {
     try{
