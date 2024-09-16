@@ -56,7 +56,11 @@ async function addProductsToMenu(menuId, productIds) { // <-- PASARLE EL ID DEL 
 // OBTENER TODOS
 const GetAll = async(req, res) =>{
     try {
-        menu.findAll()
+        menu.findAll({
+            where: {
+                Deleted: false
+            }
+        })
             .then(menus => {
                 return res.json(menus);
             })
@@ -104,33 +108,63 @@ const FindByName = async (req, res) => {
 
     }
     catch(error){
-        console.log("error");
         console.error(error);
     }
 }
 
 // UPDATE
-// const Update = async(req, res) => {
-//     try{
-//         menu.update({ 
-//             Id_Category: 0,
-//             Name: '',
-//             Price: 0,
-//             Description: '',
-//             Img: '',
-//          }, {
-//             where: {
-//                 id: req.param.id
-//             }
-//         })
-//     }
-//     catch(error){
-//         console.error(`Error Update method`);
-//     }
-// }
+const Update = async(req, res) => {
+    try{
+        menu.update({ 
+            Id_Category: req.body.Id_Category ?? req.body.Id_Category,
+            Name: req.body.Name ?? req.body.Name,
+            Price: req.body.Price ?? req.body.Price,
+            Description: req.body.Description ?? req.body.Description,
+            Img: req.body.Img ?? req.body.Img,
+         }, {
+            where: {
+                Id: req.body.Id
+            }
+        })
+        .then( () =>
+            { return res.status(200); }
+        );
+    }
+    catch(error){
+        console.error(`Error UPDATE method ${error}`);
+    }
+}
+
+// DELETE (LOGICO)
+const Delete = async(req, res) => {
+    try{
+        let menuDelete = menu.findByPk(req.body.Id);
+
+        if(!menuDelete){
+            console.log('Menu not found');
+            return res.status(404);
+        }
+
+        menu.update({
+            Deleted : 1
+        },{
+            where:{
+                Id: req.body.Id
+            }
+        })
+        .then(
+            () => { return res.status(200); }
+        )
+        .catch(
+            (error)  => { console.log('Error while DELETE menu ', error); }
+        )
+    }
+    catch(error){
+        console.error('Error DELETE method: ', error);
+    }
+}
 
 
 
 
-
-module.exports = {NewProduct, GetAll, FindById, FindByName}
+module.exports = {NewProduct, GetAll, FindById, FindByName, Update, Delete}
