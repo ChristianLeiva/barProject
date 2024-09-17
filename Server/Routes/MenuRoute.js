@@ -3,7 +3,7 @@ const router = express.Router();
 const {GetAll, FindById, FindByName, NewProduct, Update, Delete} = require('../Controllers/MenuController');
 
 router.post('/New', NewProduct);
-router.get('/All', GetAll);
+router.get('/All/:Id_Category?', GetAll);
 router.get('/Id/:id', FindById);
 router.get('/Name/:name', FindByName);
 router.put('/Update', Update);

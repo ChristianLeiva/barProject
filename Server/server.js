@@ -8,7 +8,9 @@ const port = process.env.PORT;
 const dataTest = require('../DataTest');
 
 //========================= ROUTERS ==============================
-const menu = require('./Routes/MenuRoute');
+const routerMenu = require('./Routes/MenuRoute');
+const routerProduct = require('./Routes/ProductRoute');
+const routerCategory = require('./Routes/CategoryRoute');
 //================================================================
 
 
@@ -31,8 +33,9 @@ app.get('/',(req, res) => {
     res.send("PAGINA DE INICIO");
 })
 
-app.use('/Menu', menu);
-
+app.use('/Menu', routerMenu);
+app.use('/Product', routerProduct);
+app.use('/Category', routerCategory);
 
 //=========================== INICIO EL SERVIDOR ============================
 startServer();
