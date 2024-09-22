@@ -11,6 +11,8 @@ const dataTest = require('../DataTest');
 const routerMenu = require('./Routes/MenuRoute');
 const routerProduct = require('./Routes/ProductRoute');
 const routerCategory = require('./Routes/CategoryRoute');
+const routerRole = require('./routes/RoleRoute');
+const routerUser = require('./routes/UserRoute');
 //================================================================
 
 
@@ -36,6 +38,8 @@ app.get('/',(req, res) => {
 app.use('/Menu', routerMenu);
 app.use('/Product', routerProduct);
 app.use('/Category', routerCategory);
+app.use('/Role', routerRole);
+app.use('/User', routerUser);
 
 //=========================== INICIO EL SERVIDOR ============================
 startServer();
